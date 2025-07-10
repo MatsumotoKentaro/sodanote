@@ -19,6 +19,7 @@ jobs:
       - name: Create drink_log.csv
         run: |
           echo "日付,プッシュ数,リットル数,メモ" > data/drink_log.csv
+          gh issue list --label drink --state all --limit 1000 --json title,body
           gh issue list --label drink --state all --limit 1000 --json title,body | jq -r '
             .[] |
             [.title | capture("(?<date>\\d{4}-\\d{2}-\\d{2})").date,
