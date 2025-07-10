@@ -3,6 +3,7 @@ name: Convert Issues to CSV
 on:
   issues:
     types: [opened, edited, reopened]
+  workflow_dispatch:
 
 jobs:
   convert:
@@ -26,6 +27,8 @@ jobs:
              (.body | capture("メモ: (?<memo>.*)").memo)] |
             @csv
           ' >> data/drink_log.csv
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}          
 
       - name: Create gas_log.csv
         run: |
@@ -36,6 +39,9 @@ jobs:
              (.body | capture("メモ: (?<memo>.*)").memo)] |
             @csv
           ' >> data/gas_log.csv
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}          
+
 
       - name: Commit and push CSV files
         run: |
