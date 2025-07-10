@@ -1,5 +1,8 @@
 name: Convert Issues to CSV
 
+permissions:
+  contents: write
+
 on:
   issues:
     types: [opened, edited, reopened]
