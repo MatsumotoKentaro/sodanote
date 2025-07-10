@@ -1,0 +1,41 @@
+name: Convert Issues to CSV
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gh jq
+
+      - name: Create drink_log.csv
+        run: |
+          echo "日付,プッシュ数,リットル数,メモ" > data/drink_log.csv
+          gh issue list --label drink --state all --limit 1000 --json title,body | jq -r '
+            .[] |
+            [.title | capture("(?<date>\\d{4}-\\d{2}-\\d{2})").date,
+             (.body | capture("プッシュ: (?<push>\\d+)").push),
+             (.body | capture("リットル: (?<liters>[\\d\\.]+)").liters),
+             (.body | capture("メモ: (?<memo>.*)").memo)] |
+            @csv
+          ' >> data/drink_log.csv
+
+      - name: Create gas_log.csv
+        run: |
+          echo "日付,メモ" > data/gas_log.csv
+          gh issue list --label gas_change --state all --limit 1000 --json title,body | jq -r '
+            .[] |
+            [.title | capture("(?<date>\\d{4}-\\d{2}-\\d{2})").date,
+             (.body | capture("メモ: (?<memo>.*)").memo)] |
+            @csv
+          ' >> data/gas_log.csv
+
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
