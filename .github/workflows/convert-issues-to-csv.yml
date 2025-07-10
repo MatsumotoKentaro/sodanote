@@ -37,5 +37,10 @@ jobs:
             @csv
           ' >> data/gas_log.csv
 
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Commit and push CSV files
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/*.csv
+          git commit -m "Update CSV logs from issues" || echo "No changes to commit"
+          git push origin HEAD
