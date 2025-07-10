@@ -19,14 +19,18 @@ jobs:
       - name: Create drink_log.csv
         run: |
           echo "日付,プッシュ数,リットル数,メモ" > data/drink_log.csv
-          gh issue list --label drink --state all --limit 1000 --json title,body
           gh issue list --label drink --state all --limit 1000 --json title,body | jq -r '
-            .[] |
-            [.title | capture("(?<date>\\d{4}-\\d{2}-\\d{2})").date,
-             (.body | capture("プッシュ: (?<push>\\d+)").push),
-             (.body | capture("リットル: (?<liters>[\\d\\.]+)").liters),
-             (.body | capture("メモ: (?<memo>.*)").memo)] |
-            @csv
+            if type == "array" then
+              .[]
+              | [
+                  (.title | try capture("(?<date>\\d{4}-\\d{2}-\\d{2})").date catch ""),
+                  (.body | try capture("プッシュ数: (?<push>\\d+)").push catch ""),
+                  (.body | try capture("リットル: (?<liters>[\\d\\.]+)").liters catch ""),
+                  (.body | try capture("メモ: (?<memo>.*)").memo catch "")
+                ] | @csv
+            else
+              empty
+            end
           ' >> data/drink_log.csv
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}          
