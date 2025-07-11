@@ -40,12 +40,19 @@ jobs:
 
       - name: Create gas_log.csv
         run: |
-          echo "日付,メモ" > data/gas_log.csv
+          echo "日付,購入価格,購入店舗,メモ" > data/gas_log.csv
           gh issue list --label gas_change --state all --limit 1000 --json title,body | jq -r '
-            .[] |
-            [.title | capture("(?<date>\\d{4}-\\d{2}-\\d{2})").date,
-             (.body | capture("メモ: (?<memo>.*)").memo)] |
-            @csv
+            if type == "array" then
+              .[]
+              | [
+                  (.title | try capture("(?<date>\\d{4}-\\d{2}-\\d{2})").date catch ""),
+                  (.body | try capture("購入価格: (?<price>\\d+)").price catch ""),
+                  (.body | try capture("購入店舗: (?<store>[\\d\\.]+)").store catch ""),
+                  (.body | try capture("メモ: (?<memo>.*)").memo catch "")
+                ] | @csv
+            else
+              empty
+            end
           ' >> data/gas_log.csv
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}          
