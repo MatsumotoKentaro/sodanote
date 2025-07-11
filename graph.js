@@ -28,7 +28,7 @@ fetch("data/drink_log.csv")
       data: {
         labels: sortedDates,
         datasets: [{
-          label: "炭酸リットル（合計）",
+          label: "炭酸水リットル（合計）",
           data: sortedLiters,
           backgroundColor: "rgba(75, 192, 192, 0.6)"
         }]
