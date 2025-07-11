@@ -6,7 +6,8 @@ fetch("data/drink_log.csv")
     const liters = [];
 
     lines.forEach(line => {
-      const [date, , liter] = line.split(",");
+      const [date, , rawLiter] = line.split(",");
+      const liter = rawLiter.replace(/^"|"$/g, "");
       dates.push(date);
       liters.push(parseFloat(liter));
     });
