@@ -2,29 +2,35 @@ fetch("data/drink_log.csv")
   .then(res => res.text())
   .then(csv => {
     const lines = csv.trim().split("\n").slice(1); // skip header
-    const dates = [];
-    const liters = [];
+    const totals = {};
 
     lines.forEach(line => {
       const [rawDate, , rawLiter] = line.split(",");
       const date = rawDate.replace(/^"|"$/g, "");
       const literStr = rawLiter.replace(/^"|"$/g, "");
       const liter = parseFloat(literStr);
+
       if (!isNaN(liter)) {
-        dates.push(date);
-        liters.push(liter);
+        if (!totals[date]) {
+          totals[date] = 0;
+        }
+        totals[date] += liter;
       }
     });
 
-    const ctx = document.getElementById("drinkChart");
-    new Chart(ctx, {
+    // 日付でソート
+    const sortedDates = Object.keys(totals).sort();
+    const sortedLiters = sortedDates.map(date => totals[date]);
+
+    // グラフ描画
+    new Chart(document.getElementById("drinkChart"), {
       type: "bar",
       data: {
-        labels: dates,
+        labels: sortedDates,
         datasets: [{
-          label: "炭酸リットル",
-          data: liters,
-          backgroundColor: "rgba(54, 162, 235, 0.5)"
+          label: "炭酸リットル（合計）",
+          data: sortedLiters,
+          backgroundColor: "rgba(75, 192, 192, 0.6)"
         }]
       },
       options: {
@@ -34,5 +40,4 @@ fetch("data/drink_log.csv")
         }
       }
     });
-  })
-  .catch(error => console.error("CSV読み込みエラー:", error));
+  });
