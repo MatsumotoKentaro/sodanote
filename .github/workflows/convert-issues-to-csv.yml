@@ -47,7 +47,7 @@ jobs:
               | [
                   (.title | try capture("(?<date>\\d{4}-\\d{2}-\\d{2})").date catch ""),
                   (.body | try capture("購入価格: (?<price>\\d+)").price catch ""),
-                  (.body | try capture("購入店舗: (?<store>[\\d\\.]+)").store catch ""),
+                  (.body | try capture("購入店舗: (?<store>.*").store catch ""),
                   (.body | try capture("メモ: (?<memo>.*)").memo catch "")
                 ] | @csv
             else
