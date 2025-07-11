@@ -45,18 +45,23 @@ fetch("data/drink_log.csv")
       options: {
         responsive: true,
         scales: {
+          x: {
+            ticks: {
+              autoSkip: false,
+              maxRotation: 45,
+              minRotation: 30
+            }
+          },
           yLiters: {
-            type: "linear",
+            beginAtZero: true,
             position: "left",
-            title: { display: true, text: "リットル" },
-            beginAtZero: true
+            title: { display: true, text: "リットル" }
           },
           yPushes: {
-            type: "linear",
+            beginAtZero: true,
             position: "right",
             title: { display: true, text: "プッシュ数" },
-            beginAtZero: true,
-            grid: { drawOnChartArea: false } // 折れ線の軸は棒の上に出ないように
+            grid: { drawOnChartArea: false }
           }
         }
       }

@@ -2,15 +2,42 @@
 <html>
 
 <head>
-  <meta charset="UTF-8" />
-  <title>SodaNote グラフ</title>
+  <meta charset="UTF-8">
+  <title>SodaNote</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 1rem;
+      margin: 0;
+    }
+
+    .chart-container {
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: auto;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: auto !important;
+    }
+
+    @media (max-width: 600px) {
+      canvas {
+        max-height: 300px;
+      }
+    }
+  </style>
 </head>
 
 <body>
-  <h1>炭酸水作成量グラフ</h1>
-  <canvas id="drinkChart" width="600" height="300"></canvas>
-  <script src="graph.js"></script>
+  <h1>SodaNote 炭酸記録</h1>
+  <div class="chart-container">
+    <canvas id="drinkChart"></canvas>
+  </div>
 </body>
+<script src="graph.js"></script>
 
 </html>
