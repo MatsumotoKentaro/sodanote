@@ -2,7 +2,7 @@ fetch("data/drink_log.csv")
   .then(res => res.text())
   .then(csv => {
     const lines = csv.trim().split("\n").slice(1); // skip header
-    const totals = {}; // 日付ごとの合計
+    const totals = {};
 
     lines.forEach(line => {
       const [rawDate, rawPush, rawLiter] = line.split(",");
@@ -18,9 +18,25 @@ fetch("data/drink_log.csv")
     });
 
     const sortedDates = Object.keys(totals).sort();
-    const liters = sortedDates.map(date => totals[date].liters);
-    const pushes = sortedDates.map(date => totals[date].pushes);
+    const liters = [];
+    const pushes = [];
+    const cumulativeLiters = [];
+    const cumulativePushes = [];
 
+    let literSum = 0;
+    let pushSum = 0;
+    sortedDates.forEach(date => {
+      const liter = totals[date].liters;
+      const push = totals[date].pushes;
+      liters.push(liter);
+      pushes.push(push);
+      literSum += liter;
+      pushSum += push;
+      cumulativeLiters.push(literSum);
+      cumulativePushes.push(pushSum);
+    });
+
+    // グラフ1：複合（棒＋線）
     new Chart(document.getElementById("drinkChart"), {
       type: "bar",
       data: {
@@ -46,11 +62,7 @@ fetch("data/drink_log.csv")
         responsive: true,
         scales: {
           x: {
-            ticks: {
-              autoSkip: false,
-              maxRotation: 45,
-              minRotation: 30
-            }
+            ticks: { maxRotation: 45, minRotation: 30 }
           },
           yLiters: {
             beginAtZero: true,
@@ -61,6 +73,53 @@ fetch("data/drink_log.csv")
             beginAtZero: true,
             position: "right",
             title: { display: true, text: "プッシュ数" },
+            grid: { drawOnChartArea: false }
+          }
+        }
+      }
+    });
+
+    // グラフ2：累積リットル＆プッシュ（折れ線2本）
+    new Chart(document.getElementById("cumulativeChart"), {
+      type: "line",
+      data: {
+        labels: sortedDates,
+        datasets: [
+          {
+            label: "累積リットル数",
+            data: cumulativeLiters,
+            yAxisID: "yLiters",
+            borderColor: "rgba(54, 162, 235, 1)",
+            backgroundColor: "rgba(54, 162, 235, 0.3)",
+            fill: false,
+            tension: 0.2
+          },
+          {
+            label: "累積プッシュ数",
+            data: cumulativePushes,
+            yAxisID: "yPushes",
+            borderColor: "rgba(255, 159, 64, 1)",
+            backgroundColor: "rgba(255, 159, 64, 0.3)",
+            fill: false,
+            tension: 0.2
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: {
+            ticks: { maxRotation: 45, minRotation: 30 }
+          },
+          yLiters: {
+            beginAtZero: true,
+            position: "left",
+            title: { display: true, text: "累積リットル" }
+          },
+          yPushes: {
+            beginAtZero: true,
+            position: "right",
+            title: { display: true, text: "累積プッシュ" },
             grid: { drawOnChartArea: false }
           }
         }
